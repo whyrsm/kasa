@@ -1,6 +1,47 @@
 # Kasa
 
-Kasa parses private bank statement PDFs into structured transaction data.
+Kasa turns Indonesian bank statement PDFs into structured transaction data,
+locally.
+
+## Why this exists
+
+Most personal finance tools want your banking credentials. You hand them over,
+they screen-scrape or talk to an aggregator, and your transaction history ends
+up on someone else's server. For Indonesian banks the coverage is also uneven:
+sharia products and many credit cards fall outside what consolidators support.
+
+The fallback is opening each monthly PDF and retyping numbers into a
+spreadsheet. That works for one statement. It stops working at twelve.
+
+Kasa sits in between. You point it at the PDFs the bank already sends you and
+get back rows you can audit, export, and analyze. The PDFs stay on your
+machine: no upload to a third party, no OAuth into your bank, no API token
+shared with a cloud service.
+
+## What makes it different
+
+- **Local-first.** The parser is a Python library and CLI. The web app is a
+  FastAPI service plus a React UI you run yourself. Uploaded PDFs are written
+  to a temp file and deleted after the response is prepared.
+- **Auditable extraction.** Parser tests reconcile parsed debit/credit
+  movement against the opening and closing balances printed on the statement.
+  If the math does not match, the test fails. The goal is every row correct,
+  not most rows extracted.
+- **Bank-aware, not a generic table extractor.** Tools like Tabula or
+  `pdfplumber` give you a table. They do not know that `CR` after an amount
+  means a credit, that a January statement can contain December transactions,
+  or what password format a given bank uses. Each parser in
+  `packages/parsers/` encodes those rules.
+- **Pluggable.** A new bank is a new package under
+  `packages/parsers/kasa_parsers/<bank>/` plus a registry entry. The API and
+  UI pick it up automatically.
+- **Built for Indonesian statements.** CIMB Niaga Sharia credit card is the
+  first supported format. The roadmap is broader coverage, including products
+  mainstream consolidators tend to skip.
+
+Today: CLI and a local web UI that handle upload, parse, review, and export
+to TSV/CSV for one bank. Planned: more banks, statement history, dashboards,
+and a chat assistant grounded in your own transactions.
 
 ## Workspace Setup
 
