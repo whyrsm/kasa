@@ -10,11 +10,16 @@ export type ParserMetadata = {
 
 export type Direction = "DEBIT" | "CREDIT";
 
+/**
+ * Amount-bearing fields are serialized as fixed-decimal strings (e.g. "12345.00")
+ * to avoid floating-point precision loss. Convert with `Number(amount)` only when
+ * doing arithmetic; for display, prefer `formatMoney` in StatementSummary.
+ */
 export type Transaction = {
   txn_date: string;
   post_date: string;
   description: string;
-  amount: number;
+  amount: string;
   direction: Direction;
   card_last4: string;
   cardholder: string;
@@ -28,9 +33,9 @@ export type StatementParseResponse = {
   period: string;
   transaction_count: number;
   totals: {
-    debit: number;
-    credit: number;
-    net: number;
+    debit: string;
+    credit: string;
+    net: string;
   };
   transactions: Transaction[];
   meta: Record<string, string>;

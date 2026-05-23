@@ -105,7 +105,7 @@ export default function App() {
         transaction.txn_date,
         transaction.post_date,
         transaction.description,
-        transaction.amount.toFixed(2),
+        transaction.amount,
         transaction.direction,
         transaction.card_last4,
         transaction.cardholder,

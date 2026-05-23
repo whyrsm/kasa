@@ -7,6 +7,7 @@ These tests bypass PDF reading by feeding line-list fixtures directly to
 from __future__ import annotations
 
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -65,7 +66,7 @@ def test_single_debit() -> None:
     assert len(txns) == 1
     t = txns[0]
     assert t.direction == Direction.DEBIT
-    assert t.amount == 123456.78
+    assert t.amount == Decimal("123456.78")
     assert t.card_last4 == "9999"
     assert t.cardholder == "JOHN DOE"
     assert t.description == "SOME MERCHANT"
@@ -77,7 +78,7 @@ def test_cr_marker_flips_to_credit() -> None:
     txns = parse("cr_credit")
     assert len(txns) == 1
     assert txns[0].direction == Direction.CREDIT
-    assert txns[0].amount == 500_000.00
+    assert txns[0].amount == Decimal("500000.00")
     assert txns[0].description == "PAYMENT-THANK YOU"
 
 
@@ -85,9 +86,9 @@ def test_multi_line_description() -> None:
     txns = parse("multi_line_desc")
     assert len(txns) == 2
     assert txns[0].description == "DESCRIPTION LINE 1 DESCRIPTION LINE 2"
-    assert txns[0].amount == 12_345.67
+    assert txns[0].amount == Decimal("12345.67")
     assert txns[1].description == "DESC A DESC B DESC C"
-    assert txns[1].amount == 99_999.99
+    assert txns[1].amount == Decimal("99999.99")
 
 
 def test_cross_year_post_date() -> None:
@@ -120,7 +121,7 @@ def test_last_balance_and_subtotal_captured_as_meta() -> None:
         "subtotal_9999": "1,010,000.00",
     }
     assert len(statement.transactions) == 1
-    assert statement.transactions[0].amount == 10_000.00
+    assert statement.transactions[0].amount == Decimal("10000.00")
 
 
 def test_multi_card_attribution() -> None:

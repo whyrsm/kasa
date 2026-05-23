@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import re
 import sys
+from decimal import Decimal
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -32,7 +33,7 @@ from kasa_parsers.service import get_parser_metadata, parse_statement_pdf
 REPO_ROOT = ROOT.parents[1]
 STATEMENTS_DIR = REPO_ROOT / "archives" / "statements" / "CC-CIMB"
 PASSWORD = "210493"
-TOLERANCE = 0.05
+TOLERANCE = Decimal("0.00")
 
 
 def main() -> int:
@@ -96,11 +97,11 @@ def _check_one(pdf: Path) -> int:
     return fails
 
 
-def _extract_amount_after(text: str, label: str) -> float:
+def _extract_amount_after(text: str, label: str) -> Decimal:
     m = re.search(rf"{re.escape(label)}\s*\n([\d,]+\.\d{{2}})", text)
     if not m:
         raise ValueError(f"could not find {label!r} in PDF text")
-    return float(m.group(1).replace(",", ""))
+    return Decimal(m.group(1).replace(",", ""))
 
 
 def _check_unknown_statement_raises() -> int:

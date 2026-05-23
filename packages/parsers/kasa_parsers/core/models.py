@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date
+from decimal import Decimal
 from enum import Enum
 
 
@@ -15,7 +16,7 @@ class Transaction:
     txn_date: date
     post_date: date
     description: str
-    amount: float
+    amount: Decimal
     direction: Direction
     card_last4: str
     cardholder: str

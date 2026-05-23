@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 from ..core import (
@@ -223,5 +224,5 @@ def _parse_date(s: str, stmt_year: int, stmt_month: int) -> date:
     return date(year, month, day)
 
 
-def _parse_amount(s: str) -> float:
-    return float(s.replace(",", ""))
+def _parse_amount(s: str) -> Decimal:
+    return Decimal(s.replace(",", ""))

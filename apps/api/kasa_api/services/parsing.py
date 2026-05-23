@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from decimal import Decimal
 from pathlib import Path
 
 from kasa_parsers.core import Direction, Statement
@@ -29,10 +30,12 @@ def statement_to_response(
     source_filename: str,
 ) -> StatementParseResponse:
     debit = sum(
-        t.amount for t in statement.transactions if t.direction == Direction.DEBIT
+        (t.amount for t in statement.transactions if t.direction == Direction.DEBIT),
+        Decimal(0),
     )
     credit = sum(
-        t.amount for t in statement.transactions if t.direction == Direction.CREDIT
+        (t.amount for t in statement.transactions if t.direction == Direction.CREDIT),
+        Decimal(0),
     )
     transactions = [
         TransactionOut(
