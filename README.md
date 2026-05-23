@@ -82,10 +82,11 @@ Deploy this monorepo as two Railway services from the same repository.
 API service:
 
 - Root directory: `/`
-- Start command:
+- Railpack config: `railpack.json`
+- Start command is defined in `railpack.json`:
 
 ```bash
-npm run start:api
+uv run --package kasa-api uvicorn kasa_api.main:app --app-dir apps/api --host 0.0.0.0 --port ${PORT:-8000}
 ```
 
 - Healthcheck path: `/api/health`
@@ -97,17 +98,16 @@ CORS_ALLOW_ORIGINS=https://${{kasa-web.RAILWAY_PUBLIC_DOMAIN}}
 
 Web service:
 
-- Root directory: `/`
+- Root directory: `/apps/web`
 - Build command:
 
 ```bash
-npm run build:web
+npm run build
 ```
 
 - Variables:
 
 ```bash
-RAILPACK_SPA_OUTPUT_DIR=apps/web/dist
 VITE_API_BASE_URL=https://${{kasa-api.RAILWAY_PUBLIC_DOMAIN}}
 ```
 
