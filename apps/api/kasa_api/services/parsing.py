@@ -1,26 +1,10 @@
 from __future__ import annotations
 
-from pathlib import Path
+from decimal import Decimal
 
 from kasa_parsers.core import Direction, Statement
-from kasa_parsers.service import parse_statement_pdf
 
 from ..schemas import StatementParseResponse, Totals, TransactionOut
-
-
-def parse_pdf_to_response(
-    pdf_path: Path,
-    *,
-    source_filename: str,
-    password: str | None,
-    parser_name: str | None,
-) -> StatementParseResponse:
-    statement = parse_statement_pdf(
-        pdf_path,
-        password_override=_none_if_blank(password),
-        parser_name=_none_if_blank(parser_name),
-    )
-    return statement_to_response(statement, source_filename=source_filename)
 
 
 def statement_to_response(
@@ -29,10 +13,12 @@ def statement_to_response(
     source_filename: str,
 ) -> StatementParseResponse:
     debit = sum(
-        t.amount for t in statement.transactions if t.direction == Direction.DEBIT
+        (t.amount for t in statement.transactions if t.direction == Direction.DEBIT),
+        Decimal(0),
     )
     credit = sum(
-        t.amount for t in statement.transactions if t.direction == Direction.CREDIT
+        (t.amount for t in statement.transactions if t.direction == Direction.CREDIT),
+        Decimal(0),
     )
     transactions = [
         TransactionOut(
@@ -57,10 +43,3 @@ def statement_to_response(
         transactions=transactions,
         meta=statement.meta,
     )
-
-
-def _none_if_blank(value: str | None) -> str | None:
-    if value is None:
-        return None
-    stripped = value.strip()
-    return stripped or None

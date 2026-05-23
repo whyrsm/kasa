@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { FileText } from "lucide-react";
 
-import { fetchParsers, parseStatement } from "./api/client";
+import { exportStatement, fetchParsers, parseStatement } from "./api/client";
 import type {
   ApiError,
   Direction,
@@ -83,43 +83,30 @@ export default function App() {
     }
   }
 
-  function handleExport(format: "tsv" | "csv") {
-    if (!statement) {
+  async function handleExport(format: "tsv" | "csv") {
+    if (!statement || !file) {
       return;
     }
-    const delimiter = format === "tsv" ? "\t" : ",";
-    const rows = [
-      [
-        "statement_period",
-        "txn_date",
-        "post_date",
-        "description",
-        "amount",
-        "direction",
-        "card_last4",
-        "cardholder",
-        "source_file",
-      ],
-      ...filteredTransactions.map((transaction) => [
-        statement.period,
-        transaction.txn_date,
-        transaction.post_date,
-        transaction.description,
-        transaction.amount.toFixed(2),
-        transaction.direction,
-        transaction.card_last4,
-        transaction.cardholder,
-        transaction.source_file,
-      ]),
-    ];
-    const content = rows.map((row) => row.map((cell) => escapeCell(cell, delimiter)).join(delimiter)).join("\n");
-    const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${statement.period}_${statement.bank_label}.${format}`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+    try {
+      const blob = await exportStatement({
+        file,
+        password,
+        parserName: selectedParser,
+        format,
+      });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${statement.period}_${statement.bank_label}.${format}`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      const apiError = error as ApiError;
+      setParseError({
+        error: apiError.error ?? "EXPORT_FAILED",
+        message: apiError.message ?? "The statement could not be exported.",
+      });
+    }
   }
 
   return (
@@ -204,10 +191,3 @@ function ParsingState({ fileName }: { fileName: string }) {
   );
 }
 
-function escapeCell(value: string | number, delimiter: string) {
-  const text = String(value);
-  if (text.includes(delimiter) || text.includes("\n") || text.includes('"')) {
-    return `"${text.replaceAll('"', '""')}"`;
-  }
-  return text;
-}

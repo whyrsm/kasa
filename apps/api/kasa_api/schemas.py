@@ -1,6 +1,14 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from decimal import Decimal
+from typing import Annotated
+
+from pydantic import BaseModel, PlainSerializer
+
+Money = Annotated[
+    Decimal,
+    PlainSerializer(lambda v: f"{v:.2f}", return_type=str, when_used="json"),
+]
 
 
 class HealthResponse(BaseModel):
@@ -18,16 +26,16 @@ class ParserMetadata(BaseModel):
 
 
 class Totals(BaseModel):
-    debit: float
-    credit: float
-    net: float
+    debit: Money
+    credit: Money
+    net: Money
 
 
 class TransactionOut(BaseModel):
     txn_date: str
     post_date: str
     description: str
-    amount: float
+    amount: Money
     direction: str
     card_last4: str
     cardholder: str

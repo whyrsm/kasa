@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import re
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 from ..core import (
@@ -12,9 +13,7 @@ from ..core import (
     register_parser,
 )
 
-CARD_HEADER = re.compile(
-    r"^\d{4}\s+\d{2}XX\s+XXXX\s+(?P<last4>\d{4})\s+(?P<name>.+)$"
-)
+CARD_HEADER = re.compile(r"^\d{4}\s+\d{2}XX\s+XXXX\s+(?P<last4>\d{4})\s+(?P<name>.+)$")
 DATE = re.compile(r"^\d{2}/\d{2}$")
 AMOUNT = re.compile(r"^[\d,]+\.\d{2}$")
 FILENAME_DATE = re.compile(r"_(\d{2})-(\d{2})-(\d{4})_")
@@ -137,11 +136,7 @@ def _try_consume_transaction(
     for desc_end in range(desc_start + 1, min(desc_start + 1 + MAX_DESC_LINES, n)):
         candidate = lines[desc_end]
         if not AMOUNT.match(candidate):
-            if (
-                candidate in DESC_BAILOUT
-                or DATE.match(candidate)
-                or CARD_HEADER.match(candidate)
-            ):
+            if candidate in DESC_BAILOUT or DATE.match(candidate) or CARD_HEADER.match(candidate):
                 return 0
             continue
         desc = " ".join(lines[desc_start:desc_end])
@@ -223,5 +218,5 @@ def _parse_date(s: str, stmt_year: int, stmt_month: int) -> date:
     return date(year, month, day)
 
 
-def _parse_amount(s: str) -> float:
-    return float(s.replace(",", ""))
+def _parse_amount(s: str) -> Decimal:
+    return Decimal(s.replace(",", ""))

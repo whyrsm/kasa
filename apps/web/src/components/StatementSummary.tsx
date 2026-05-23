@@ -93,7 +93,7 @@ export function StatementSummary({
   );
 }
 
-function Metric({ label, value, tone }: { label: string; value: number; tone: "debit" | "credit" | "net" }) {
+function Metric({ label, value, tone }: { label: string; value: string; tone: "debit" | "credit" | "net" }) {
   const Icon = tone === "debit" ? ArrowUpRight : tone === "credit" ? ArrowDownLeft : Scale;
 
   return (
@@ -248,11 +248,15 @@ function displayName(parserName: string) {
   return parserName.replaceAll("_", " ");
 }
 
-function formatMoney(value: number) {
+function formatMoney(value: string) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) {
+    return value;
+  }
   return new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
-  }).format(value);
+  }).format(n);
 }
 
 function formatDate(value: string) {

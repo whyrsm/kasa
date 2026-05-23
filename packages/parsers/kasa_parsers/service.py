@@ -58,9 +58,7 @@ def _select_parser_with_pages(
         pages = read_pdf_pages(pdf_path, password)
         text = _pages_text(pages)
         if not parser_cls.signature(text):
-            raise UnknownStatementError(
-                f"decrypted but content does not match {parser_cls.name}"
-            )
+            raise UnknownStatementError(f"decrypted but content does not match {parser_cls.name}")
         return parser_cls, pages
 
     if password_override is not None:
@@ -99,14 +97,12 @@ def _parser_by_name(
         if parser_cls.name == parser_name:
             return parser_cls
     available = ", ".join(cls.name for cls in parsers)
-    raise UnknownStatementError(
-        f"unknown parser {parser_name!r}. Available parsers: {available}"
-    )
+    raise UnknownStatementError(f"unknown parser {parser_name!r}. Available parsers: {available}")
 
 
 def _display_name(parser_cls: type[StatementParser]) -> str:
     if hasattr(parser_cls, "display_name"):
-        return str(getattr(parser_cls, "display_name"))
+        return str(parser_cls.display_name)
     return parser_cls.name.replace("_", " ").title()
 
 
