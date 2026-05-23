@@ -1,4 +1,4 @@
-import { Download, Search, X } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Download, ReceiptText, Scale, Search, X } from "lucide-react";
 
 import type { Direction, StatementParseResponse, Transaction } from "../api/types";
 
@@ -36,13 +36,16 @@ export function StatementSummary({
             Statement date: {statement.statement_date} <span>Period: {statement.period}</span>
           </p>
         </div>
-        <span className="count-pill">{statement.transaction_count} rows</span>
+        <span className="count-pill">
+          <ReceiptText aria-hidden="true" size={15} />
+          {statement.transaction_count} rows
+        </span>
       </header>
 
       <div className="totals-strip">
-        <Metric label="Debit" value={statement.totals.debit} />
-        <Metric label="Credit" value={statement.totals.credit} />
-        <Metric label="Net" value={statement.totals.net} />
+        <Metric label="Debit" value={statement.totals.debit} tone="debit" />
+        <Metric label="Credit" value={statement.totals.credit} tone="credit" />
+        <Metric label="Net" value={statement.totals.net} tone="net" />
       </div>
 
       <div className="transaction-toolbar">
@@ -90,10 +93,15 @@ export function StatementSummary({
   );
 }
 
-function Metric({ label, value }: { label: string; value: number }) {
+function Metric({ label, value, tone }: { label: string; value: number; tone: "debit" | "credit" | "net" }) {
+  const Icon = tone === "debit" ? ArrowUpRight : tone === "credit" ? ArrowDownLeft : Scale;
+
   return (
-    <div>
-      <span>{label}</span>
+    <div className={`metric ${tone}`}>
+      <span>
+        <Icon aria-hidden="true" size={16} />
+        {label}
+      </span>
       <strong>{formatMoney(value)}</strong>
     </div>
   );
@@ -109,6 +117,16 @@ function TransactionTable({
   return (
     <div className="table-wrap">
       <table>
+        <colgroup>
+          <col className="date-column" />
+          <col className="date-column" />
+          <col className="description-column" />
+          <col className="amount-column" />
+          <col className="direction-column" />
+          <col className="card-column" />
+          <col className="cardholder-column" />
+          <col className="source-column" />
+        </colgroup>
         <thead>
           <tr>
             <th>Txn Date</th>
@@ -127,9 +145,13 @@ function TransactionTable({
               key={`${transaction.txn_date}-${transaction.description}-${index}`}
               onClick={() => onSelectTransaction(transaction)}
             >
-              <td>{transaction.txn_date}</td>
-              <td>{transaction.post_date}</td>
-              <td className="description-cell" title={transaction.description}>
+              <td className="date-cell">
+                <time dateTime={transaction.txn_date}>{formatDate(transaction.txn_date)}</time>
+              </td>
+              <td className="date-cell">
+                <time dateTime={transaction.post_date}>{formatDate(transaction.post_date)}</time>
+              </td>
+              <td className="description-cell">
                 {transaction.description}
               </td>
               <td className="amount-cell">{formatMoney(transaction.amount)}</td>
@@ -138,8 +160,8 @@ function TransactionTable({
                   {transaction.direction}
                 </span>
               </td>
-              <td>{transaction.card_last4}</td>
-              <td>{transaction.cardholder}</td>
+              <td className="card-cell">{transaction.card_last4}</td>
+              <td className="cardholder-cell">{transaction.cardholder}</td>
               <td className="source-cell" title={transaction.source_file}>
                 {transaction.source_file}
               </td>
@@ -231,4 +253,17 @@ function formatMoney(value: number) {
     maximumFractionDigits: 2,
     minimumFractionDigits: 2,
   }).format(value);
+}
+
+function formatDate(value: string) {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(Date.UTC(year, month - 1, day)));
 }

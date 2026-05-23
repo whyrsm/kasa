@@ -1,0 +1,9 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Kasa mark</title>
+  <desc id="desc">A structured finance document mark.</desc>
+  <rect x="2" y="2" width="44" height="44" rx="10" fill="#183E43"/>
+  <path d="M15 13.5H30.6L37 19.9V34.5H15V13.5Z" fill="#F8FAF7"/>
+  <path d="M30.5 13.5V20H37" stroke="#8FA9A4" stroke-width="1.8" stroke-linejoin="round"/>
+  <rect x="20" y="24" width="12.5" height="2.2" rx="1.1" fill="#1F7A78"/>
+  <rect x="20" y="29" width="8.8" height="2.2" rx="1.1" fill="#D89532"/>
+</svg>

@@ -1,4 +1,4 @@
-import { FileUp, Lock, Play, ShieldCheck, Upload } from "lucide-react";
+import { FileUp, Lock, Play, ShieldCheck, Trash2, Upload } from "lucide-react";
 
 import type { ParserMetadata } from "../api/types";
 
@@ -90,6 +90,7 @@ export function StatementUploadPanel({
         <h3>Privacy</h3>
         <label className="radio-row">
           <input type="radio" checked readOnly />
+          <Trash2 aria-hidden="true" size={15} />
           <span>Do not save PDF</span>
         </label>
         <label className="radio-row disabled">
