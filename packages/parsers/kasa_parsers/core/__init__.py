@@ -7,7 +7,7 @@ from .registry import (
     register_parser,
     resolve_parser,
 )
-from .tsv import write_tsv
+from .tsv import statement_to_delimited, write_tsv
 
 __all__ = [
     "Direction",
@@ -21,5 +21,6 @@ __all__ = [
     "read_pdf_pages",
     "register_parser",
     "resolve_parser",
+    "statement_to_delimited",
     "write_tsv",
 ]

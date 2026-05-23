@@ -51,6 +51,26 @@ def test_parse_rejects_invalid_pdf_bytes() -> None:
     }
 
 
+def test_export_rejects_non_pdf() -> None:
+    response = client.post(
+        "/api/statements/export",
+        files={"file": ("statement.txt", b"not a pdf", "text/plain")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"] == "UNSUPPORTED_FILE"
+
+
+def test_export_rejects_invalid_pdf_bytes() -> None:
+    response = client.post(
+        "/api/statements/export?format=tsv",
+        files={"file": ("statement.pdf", b"not a pdf", "application/pdf")},
+    )
+
+    assert response.status_code == 400
+    assert response.json()["error"] == "INVALID_PDF"
+
+
 def test_parse_rejects_oversize_upload() -> None:
     from kasa_api.routes.statements import MAX_UPLOAD_BYTES
 
@@ -72,7 +92,7 @@ def test_unhandled_exception_returns_500(monkeypatch: pytest.MonkeyPatch) -> Non
     def boom(*_args: object, **_kwargs: object) -> None:
         raise RuntimeError("parser exploded")
 
-    monkeypatch.setattr(statements_route, "parse_pdf_to_response", boom)
+    monkeypatch.setattr(statements_route, "parse_statement_pdf", boom)
 
     response = client.post(
         "/api/statements/parse",
