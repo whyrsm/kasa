@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import shutil
 import tempfile
 from pathlib import Path
 
@@ -12,11 +11,30 @@ from ..services.parsing import parse_pdf_to_response
 
 router = APIRouter(prefix="/api/statements", tags=["statements"])
 
+MAX_UPLOAD_BYTES = 20 * 1024 * 1024
+_COPY_CHUNK_SIZE = 1024 * 1024
+
+
+class _UploadTooLarge(Exception):
+    pass
+
+
+def _copy_with_limit(src, dst, limit: int) -> None:
+    total = 0
+    while True:
+        chunk = src.read(_COPY_CHUNK_SIZE)
+        if not chunk:
+            return
+        total += len(chunk)
+        if total > limit:
+            raise _UploadTooLarge()
+        dst.write(chunk)
+
 
 @router.post(
     "/parse",
     response_model=StatementParseResponse,
-    responses={400: {"model": ApiError}},
+    responses={400: {"model": ApiError}, 413: {"model": ApiError}},
 )
 async def parse_statement(
     file: UploadFile = File(...),
@@ -35,7 +53,7 @@ async def parse_statement(
     try:
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp:
             temp_path = Path(temp.name)
-            shutil.copyfileobj(file.file, temp)
+            _copy_with_limit(file.file, temp, MAX_UPLOAD_BYTES)
 
         return parse_pdf_to_response(
             temp_path,
@@ -43,6 +61,12 @@ async def parse_statement(
             password=password,
             parser_name=parser_name,
         )
+    except _UploadTooLarge as e:
+        raise _api_error(
+            status_code=413,
+            code="FILE_TOO_LARGE",
+            message=f"File exceeds {MAX_UPLOAD_BYTES // (1024 * 1024)} MB limit.",
+        ) from e
     except InvalidPdfError as e:
         raise _api_error(
             status_code=400,
