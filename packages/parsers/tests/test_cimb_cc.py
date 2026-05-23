@@ -6,8 +6,8 @@ Invariant we rely on:
 Both balances are printed in every PDF, so this works for any month without
 hand-transcribing summary tables.
 
-Run from kasa/parsers/:
-    uv run python tests/test_cimb_cc.py
+Run from repo root:
+    npm run smoke:parsers
 """
 
 from __future__ import annotations
@@ -29,7 +29,8 @@ from kasa_parsers.core import (
 )
 from kasa_parsers.service import get_parser_metadata, parse_statement_pdf
 
-STATEMENTS_DIR = ROOT.parent / "archives" / "statements" / "CC-CIMB"
+REPO_ROOT = ROOT.parents[1]
+STATEMENTS_DIR = REPO_ROOT / "archives" / "statements" / "CC-CIMB"
 PASSWORD = "210493"
 TOLERANCE = 0.05
 

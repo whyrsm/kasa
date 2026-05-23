@@ -2,11 +2,25 @@
 
 Kasa parses private bank statement PDFs into structured transaction data.
 
+## Workspace Setup
+
+Install JavaScript dependencies from the repository root:
+
+```bash
+npm install
+```
+
+Python dependencies are managed by the root `uv` workspace and are synced on
+first `uv run`. To install them explicitly:
+
+```bash
+uv sync --all-packages
+```
+
 ## Parser CLI
 
 ```bash
-cd parsers
-uv run python -m kasa_parsers ../archives/statements/CC-CIMB/
+uv run --package kasa-parsers python -m kasa_parsers archives/statements/CC-CIMB/
 ```
 
 Generated TSVs are written under `archives/tsv/`, which is ignored by git.
@@ -16,16 +30,13 @@ Generated TSVs are written under `archives/tsv/`, which is ignored by git.
 Start the API:
 
 ```bash
-cd apps/api
-uv run fastapi dev kasa_api/main.py
+npm run dev:api
 ```
 
 Start the web UI in a second terminal:
 
 ```bash
-cd apps/web
-npm install
-npm run dev
+npm run dev:web
 ```
 
 The web UI defaults to `http://localhost:8000` for the API. To point it
@@ -40,20 +51,26 @@ after the response is prepared. Do not commit private PDFs or generated exports.
 Parser smoke test:
 
 ```bash
-cd parsers
-uv run python tests/test_cimb_cc.py
+npm run smoke:parsers
 ```
+
+This smoke test expects local private PDFs under
+`archives/statements/CC-CIMB/`.
 
 API tests:
 
 ```bash
-cd apps/api
-uv run python -m pytest
+npm run test:api
 ```
 
 Web build:
 
 ```bash
-cd apps/web
-npm run build
+npm run build:web
+```
+
+Default verification:
+
+```bash
+npm test
 ```

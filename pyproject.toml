@@ -1,0 +1,12 @@
+[project]
+name = "kasa"
+version = "0.1.0"
+description = "Monorepo workspace for Kasa."
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "apps/api",
+    "packages/parsers",
+]

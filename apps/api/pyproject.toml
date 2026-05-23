@@ -14,7 +14,7 @@ dev = [
 ]
 
 [tool.uv.sources]
-kasa-parsers = { path = "../../parsers", editable = true }
+kasa-parsers = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
