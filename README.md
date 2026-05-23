@@ -74,3 +74,42 @@ Default verification:
 ```bash
 npm test
 ```
+
+## Railway Deployment
+
+Deploy this monorepo as two Railway services from the same repository.
+
+API service:
+
+- Root directory: `/`
+- Start command:
+
+```bash
+npm run start:api
+```
+
+- Healthcheck path: `/api/health`
+- Variables:
+
+```bash
+CORS_ALLOW_ORIGINS=https://${{kasa-web.RAILWAY_PUBLIC_DOMAIN}}
+```
+
+Web service:
+
+- Root directory: `/`
+- Build command:
+
+```bash
+npm run build:web
+```
+
+- Variables:
+
+```bash
+RAILPACK_SPA_OUTPUT_DIR=apps/web/dist
+VITE_API_BASE_URL=https://${{kasa-api.RAILWAY_PUBLIC_DOMAIN}}
+```
+
+Adjust `kasa-api` and `kasa-web` in the reference variables if the Railway
+services use different names.
