@@ -12,4 +12,11 @@
 .DS_Store
 __pycache__/
 *.py[cod]
+.pytest_cache/
 .venv/
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+apps/web/.env
+apps/api/.env

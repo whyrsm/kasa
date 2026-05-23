@@ -1,0 +1,24 @@
+[project]
+name = "kasa-api"
+version = "0.1.0"
+description = "Local HTTP API for parsing Kasa bank statements."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi[standard]>=0.115",
+    "kasa-parsers",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.uv.sources]
+kasa-parsers = { path = "../../parsers", editable = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["kasa_api"]

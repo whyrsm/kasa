@@ -27,6 +27,10 @@ STOP_TOKENS = {"ENDING BALANCE", "*** END OF STATEMENT ***"}
 class CIMBCreditCardParser(StatementParser):
     name = "cimb_cc"
     bank_label = "CC-CIMB"
+    display_name = "CIMB Niaga Sharia Credit Card"
+    institution = "CIMB Niaga"
+    statement_type = "credit_card"
+    country = "ID"
     default_password = "210493"
 
     SIGNATURE_TOKENS = ("PERINCIAN TAGIHAN", "RINGKASAN TAGIHAN", "Tgl. Pembukuan")

@@ -27,6 +27,7 @@ from kasa_parsers.core import (
     read_pdf_pages,
     resolve_parser,
 )
+from kasa_parsers.service import get_parser_metadata, parse_statement_pdf
 
 STATEMENTS_DIR = ROOT.parent / "archives" / "statements" / "CC-CIMB"
 PASSWORD = "210493"
@@ -48,6 +49,7 @@ def main() -> int:
             failures += 1
 
     failures += _check_unknown_statement_raises()
+    failures += _check_service_api()
     failures += _check_jan_known_credits()
     print(f"\n{'OK' if failures == 0 else 'FAILED'} ({failures} failures)")
     return 0 if failures == 0 else 1
@@ -108,6 +110,40 @@ def _check_unknown_statement_raises() -> int:
         return 0
     print("\nresolve_parser did NOT raise on unknown text: FAIL")
     return 1
+
+
+def _check_service_api() -> int:
+    pdf = STATEMENTS_DIR / "sharia card billing statement_19-01-2026_546386576.pdf"
+    fails = 0
+
+    statement = parse_statement_pdf(pdf, parser_name="cimb_cc")
+    if statement.parser_name != "cimb_cc":
+        print(f"\nservice parser name FAIL: {statement.parser_name}")
+        fails += 1
+    if statement.period != "2026-01":
+        print(f"\nservice period FAIL: {statement.period}")
+        fails += 1
+    if len(statement.transactions) != 56:
+        print(f"\nservice row count FAIL: {len(statement.transactions)}")
+        fails += 1
+
+    metadata = get_parser_metadata()
+    cimb = [item for item in metadata if item["name"] == "cimb_cc"]
+    if not cimb or cimb[0]["display_name"] != "CIMB Niaga Sharia Credit Card":
+        print(f"\nservice metadata FAIL: {metadata}")
+        fails += 1
+
+    try:
+        parse_statement_pdf(pdf, parser_name="missing_parser")
+    except UnknownStatementError:
+        pass
+    else:
+        print("\nservice unknown parser override did NOT raise: FAIL")
+        fails += 1
+
+    if fails == 0:
+        print("\nservice parse override, metadata, unknown parser checks: OK")
+    return fails
 
 
 def _check_jan_known_credits() -> int:
