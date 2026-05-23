@@ -12,8 +12,9 @@
     "build:web": "npm run build --workspace kasa-web",
     "preview:web": "npm run preview --workspace kasa-web",
     "test:api": "uv run --package kasa-api python -m pytest apps/api/tests",
+    "test:parsers": "uv run --package kasa-parsers python -m pytest packages/parsers/tests --ignore=packages/parsers/tests/test_cimb_cc.py",
     "smoke:parsers": "uv run --package kasa-parsers python packages/parsers/tests/test_cimb_cc.py",
     "build": "npm run build:web",
-    "test": "npm run test:api && npm run build:web"
+    "test": "npm run test:parsers && npm run test:api && npm run build:web"
   }
 }
