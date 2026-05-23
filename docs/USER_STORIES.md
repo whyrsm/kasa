@@ -48,8 +48,7 @@ Engineer yang menambah parser bank baru, memperbaiki akurasi ekstraksi, dan menj
 
 - As a user, I want personal financial PDFs and generated TSVs stored under ignored archive folders so that private data is not committed accidentally.
 - As a user, I want generated financial exports ignored by git so that private output files remain local.
-
-## Planned User Stories
+- As a user, I want uploaded PDFs deleted after API parsing so that browser uploads are not retained by default.
 
 ### Web Upload
 
@@ -68,8 +67,9 @@ Engineer yang menambah parser bank baru, memperbaiki akurasi ekstraksi, dan menj
 - As a user, I want to inspect parsed transactions in a table so that I can review extraction quality.
 - As a user, I want to search transaction descriptions so that I can quickly find a merchant or payment.
 - As a user, I want to filter transactions by direction so that I can focus on spending or credits.
-- As a user, I want table columns to adapt to available data so that bank-specific missing fields do not create confusing empty UI.
 - As a user, I want to export parsed data as TSV or CSV so that I can use it outside Kasa.
+
+## Planned User Stories
 
 ### Statement History
 
@@ -129,3 +129,4 @@ If no, add an entry to "Maintenance Log" saying no user story update was require
 ## Maintenance Log
 
 - 2026-05-23: Initial user stories document created. Current CLI parser behavior, planned web UI, multi-bank extensibility, privacy handling, dashboard direction, and AI chat direction documented.
+- 2026-05-23: Web upload/results MVP moved from planned to current, including parser metadata, temporary API uploads, browser review, filtering, and TSV/CSV export.
