@@ -4,14 +4,8 @@ import argparse
 import sys
 from pathlib import Path
 
-from .core import (
-    PdfDecryptError,
-    UnknownStatementError,
-    all_parsers,
-    read_pdf_pages,
-    resolve_parser,
-    write_tsv,
-)
+from .core import PdfDecryptError, UnknownStatementError, write_tsv
+from .service import parse_statement_pdf
 
 # Default output: <repo-root>/archives/tsv/, anchored to package location so it works
 # regardless of CWD. Package is at <repo-root>/parsers/kasa_parsers/, so
@@ -85,53 +79,9 @@ def _process_one(
     password_override: str | None,
     out_dir: Path,
 ) -> tuple[Path, int]:
-    parser_cls = _select_parser(pdf, password_override=password_override)
-    password = password_override or parser_cls.default_password
-    pages = read_pdf_pages(pdf, password)
-    text = "\n".join(ln for page in pages for ln in page)
-    if not parser_cls.signature(text):
-        raise UnknownStatementError(
-            f"decrypted but content does not match {parser_cls.name}"
-        )
-    statement = parser_cls().parse(pages, pdf)
+    statement = parse_statement_pdf(pdf, password_override=password_override)
 
     filename = f"{statement.statement_date.isoformat()}_{statement.bank_label}.tsv"
     out_path = out_dir / filename
     rows = write_tsv(statement, out_path, source_file=pdf.name)
     return out_path, rows
-
-
-def _select_parser(pdf: Path, *, password_override: str | None):
-    """Try each registered parser's default password until one decrypts.
-
-    With an override, just use it and pick the parser that matches the content.
-    """
-    parsers = all_parsers()
-    if not parsers:
-        raise UnknownStatementError("no parsers registered")
-
-    if password_override is not None:
-        pages = read_pdf_pages(pdf, password_override)
-        text = "\n".join(ln for page in pages for ln in page)
-        for cls in parsers:
-            if cls.signature(text):
-                return cls
-        raise UnknownStatementError(
-            f"override password worked but no parser matched content of {pdf.name}"
-        )
-
-    last_err: Exception | None = None
-    for cls in parsers:
-        try:
-            pages = read_pdf_pages(pdf, cls.default_password)
-        except PdfDecryptError as e:
-            last_err = e
-            continue
-        text = "\n".join(ln for page in pages for ln in page)
-        if cls.signature(text):
-            return cls
-        last_err = UnknownStatementError(
-            f"{cls.name} decrypted {pdf.name} but content did not match"
-        )
-    assert last_err is not None
-    raise last_err
