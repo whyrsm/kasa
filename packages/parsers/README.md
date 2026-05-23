@@ -5,19 +5,19 @@ Ekstrak PDF bank statement → TSV.
 ## Setup
 
 ```
-uv sync
+uv sync --package kasa-parsers
 ```
 
 ## Pakai
 
 Satu file:
 ```
-uv run python -m kasa_parsers ../archives/statements/CC-CIMB/<file>.pdf
+uv run --package kasa-parsers python -m kasa_parsers archives/statements/CC-CIMB/<file>.pdf
 ```
 
 Satu direktori (rekursif):
 ```
-uv run python -m kasa_parsers ../archives/statements/CC-CIMB/
+uv run --package kasa-parsers python -m kasa_parsers archives/statements/CC-CIMB/
 ```
 
 Output: `kasa/archives/tsv/<YYYY-MM-DD>_<BANK-LABEL>.tsv` (mis. `2026-01-19_CC-CIMB.tsv`).
@@ -31,7 +31,7 @@ Password: tiap parser punya `default_password` sendiri (CIMB: `210493`). Overrid
 
 ## Tambah bank baru
 
-1. Buat folder `kasa_parsers/<bank>/`.
+1. Buat folder `packages/parsers/kasa_parsers/<bank>/`.
 2. Implement `StatementParser` — isi `name`, `bank_label`, `default_password`, `signature(text)`, `parse(pages, source_path)`.
 3. Decorator `@register_parser` di class.
 4. Import package di `kasa_parsers/__init__.py` supaya auto-register.

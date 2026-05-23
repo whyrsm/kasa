@@ -7,10 +7,9 @@ from pathlib import Path
 from .core import PdfDecryptError, UnknownStatementError, write_tsv
 from .service import parse_statement_pdf
 
-# Default output: <repo-root>/archives/tsv/, anchored to package location so it works
-# regardless of CWD. Package is at <repo-root>/parsers/kasa_parsers/, so
-# parents[2] = <repo-root> (kasa/).
-DEFAULT_OUT_DIR = Path(__file__).resolve().parents[2] / "archives" / "tsv"
+# Default output: <repo-root>/archives/tsv/, anchored to package location so it
+# works regardless of CWD. Package is at <repo-root>/packages/parsers/kasa_parsers/.
+DEFAULT_OUT_DIR = Path(__file__).resolve().parents[3] / "archives" / "tsv"
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -2,11 +2,10 @@
 
 ## Context
 
-Saat ini kode utama Kasa berada di `parsers/` dan masih berbentuk CLI:
+Kode parser Kasa berada di `packages/parsers/` dan bisa dipakai lewat CLI:
 
 ```bash
-cd parsers
-uv run python -m kasa_parsers ../archives/statements/CC-CIMB/
+uv run --package kasa-parsers python -m kasa_parsers archives/statements/CC-CIMB/
 ```
 
 CLI sudah bisa:
@@ -57,7 +56,7 @@ Rekomendasi awal:
 
 - Backend: FastAPI.
 - Frontend: React + Vite.
-- Parser core: tetap `parsers/kasa_parsers`.
+- Parser core: tetap `packages/parsers/kasa_parsers`.
 - Storage awal: filesystem lokal.
 - Persistence awal: JSON/SQLite ringan, tergantung kebutuhan history.
 
@@ -218,7 +217,7 @@ Workflow ideal untuk menambah bank baru:
 1. Buat folder parser baru:
 
 ```text
-parsers/kasa_parsers/bca/
+packages/parsers/kasa_parsers/bca/
 ```
 
 2. Implement class parser:
@@ -271,13 +270,6 @@ ending_balance - last_balance == sum(DEBIT) - sum(CREDIT)
 
 ```text
 kasa/
-  parsers/
-    kasa_parsers/
-      core/
-      cimb_cc/
-    tests/
-    pyproject.toml
-
   apps/
     api/
       pyproject.toml
@@ -295,6 +287,14 @@ kasa/
         components/
         pages/
 
+  packages/
+    parsers/
+      pyproject.toml
+      kasa_parsers/
+        core/
+        cimb_cc/
+      tests/
+
   data/
     uploads/
     parsed/
@@ -305,7 +305,7 @@ kasa/
 
 Notes:
 
-- `parsers/` tetap reusable sebagai library.
+- `packages/parsers/` tetap reusable sebagai library.
 - `apps/api/` hanya mengurus HTTP, upload, storage, dan pemanggilan parser.
 - `apps/web/` hanya UI.
 - `data/` berisi file runtime lokal dan sebaiknya masuk `.gitignore`.
@@ -509,7 +509,7 @@ Minimal parser refactor:
 Suggested new module:
 
 ```text
-parsers/kasa_parsers/service.py
+packages/parsers/kasa_parsers/service.py
 ```
 
 Possible API:

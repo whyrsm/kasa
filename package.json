@@ -1,0 +1,19 @@
+{
+  "name": "kasa",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/web"
+  ],
+  "scripts": {
+    "dev:api": "uv run --package kasa-api fastapi dev apps/api/kasa_api/main.py",
+    "dev:web": "npm run dev --workspace kasa-web",
+    "start:api": "uv run --package kasa-api uvicorn kasa_api.main:app --app-dir apps/api --host 0.0.0.0 --port ${PORT:-8000}",
+    "build:web": "npm run build --workspace kasa-web",
+    "preview:web": "npm run preview --workspace kasa-web",
+    "test:api": "uv run --package kasa-api python -m pytest apps/api/tests",
+    "smoke:parsers": "uv run --package kasa-parsers python packages/parsers/tests/test_cimb_cc.py",
+    "build": "npm run build:web",
+    "test": "npm run test:api && npm run build:web"
+  }
+}
