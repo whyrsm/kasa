@@ -1,0 +1,15 @@
+# Private financial data and generated exports.
+/archives/statements/
+/archives/tsv/
+/archives/analysis/
+/archives/reimburse/
+
+# Prevent old root-level private data folders from being re-added.
+/statements/
+/tsv/
+
+# Local runtime/build artifacts.
+.DS_Store
+__pycache__/
+*.py[cod]
+.venv/
