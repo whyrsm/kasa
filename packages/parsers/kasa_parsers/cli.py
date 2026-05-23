@@ -1,15 +1,21 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
 from .core import PdfDecryptError, UnknownStatementError, write_tsv
 from .service import parse_statement_pdf
 
-# Default output: <repo-root>/archives/tsv/, anchored to package location so it
-# works regardless of CWD. Package is at <repo-root>/packages/parsers/kasa_parsers/.
-DEFAULT_OUT_DIR = Path(__file__).resolve().parents[3] / "archives" / "tsv"
+DEFAULT_OUT_DIR_NAME = Path("archives") / "tsv"
+
+
+def _default_out_dir() -> Path:
+    env = os.environ.get("KASA_OUT_DIR")
+    if env:
+        return Path(env)
+    return Path.cwd() / DEFAULT_OUT_DIR_NAME
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -19,7 +25,7 @@ def main(argv: list[str] | None = None) -> int:
         print(f"no PDF files found at {args.input}", file=sys.stderr)
         return 2
 
-    out_dir = args.out or DEFAULT_OUT_DIR
+    out_dir = (args.out or _default_out_dir()).resolve()
     print(f"Writing TSVs to: {out_dir}")
 
     ok = 0
@@ -54,7 +60,10 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         "--out",
         type=Path,
         default=None,
-        help=f"Output directory (default: {DEFAULT_OUT_DIR})",
+        help=(
+            "Output directory. Default: $KASA_OUT_DIR, or "
+            f"./{DEFAULT_OUT_DIR_NAME} relative to current working directory."
+        ),
     )
     p.add_argument(
         "--password",
