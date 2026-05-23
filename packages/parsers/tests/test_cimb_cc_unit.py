@@ -10,9 +10,8 @@ from datetime import date
 from decimal import Decimal
 from pathlib import Path
 
-import pytest
-
 import kasa_parsers  # noqa: F401 — register parsers
+import pytest
 from kasa_parsers.cimb_cc.parser import CIMBCreditCardParser
 from kasa_parsers.core import Direction, Transaction
 
@@ -139,9 +138,7 @@ def test_multi_card_attribution() -> None:
 def test_statement_date_from_filename_wins_over_body() -> None:
     """If filename has _dd-mm-yyyy_ pattern, use it instead of Tgl. Statement line."""
     pages = load_fixture("single_debit")  # body says 15/01/26
-    statement = CIMBCreditCardParser().parse(
-        pages, Path("anything_19-03-2027_xyz.pdf")
-    )
+    statement = CIMBCreditCardParser().parse(pages, Path("anything_19-03-2027_xyz.pdf"))
     assert statement.statement_date == date(2027, 3, 19)
 
 

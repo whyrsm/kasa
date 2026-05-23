@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import tempfile
 from pathlib import Path
-from typing import Literal
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, File, Form, HTTPException, Query, UploadFile
 from fastapi.responses import Response
@@ -30,9 +30,9 @@ _COPY_CHUNK_SIZE = 1024 * 1024
     responses={400: {"model": ApiError}, 413: {"model": ApiError}},
 )
 async def parse_statement(
-    file: UploadFile = File(...),
-    password: str | None = Form(default=None),
-    parser_name: str | None = Form(default=None),
+    file: Annotated[UploadFile, File()],
+    password: Annotated[str | None, Form()] = None,
+    parser_name: Annotated[str | None, Form()] = None,
 ) -> StatementParseResponse:
     source_filename = _validate_pdf_filename(file)
     temp_path: Path | None = None
@@ -55,10 +55,10 @@ async def parse_statement(
     },
 )
 async def export_statement(
-    file: UploadFile = File(...),
-    password: str | None = Form(default=None),
-    parser_name: str | None = Form(default=None),
-    format: Literal["tsv", "csv"] = Query(default="tsv"),
+    file: Annotated[UploadFile, File()],
+    password: Annotated[str | None, Form()] = None,
+    parser_name: Annotated[str | None, Form()] = None,
+    format: Annotated[Literal["tsv", "csv"], Query()] = "tsv",
 ) -> Response:
     """Parse a PDF and return delimited-text export of ALL transactions (no filter)."""
     source_filename = _validate_pdf_filename(file)

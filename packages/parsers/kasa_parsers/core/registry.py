@@ -26,6 +26,5 @@ def resolve_parser(text: str) -> type[StatementParser]:
         if cls.signature(text):
             return cls
     raise UnknownStatementError(
-        "no registered parser matched this statement. "
-        f"Tried: {[c.name for c in _REGISTRY]}"
+        f"no registered parser matched this statement. Tried: {[c.name for c in _REGISTRY]}"
     )

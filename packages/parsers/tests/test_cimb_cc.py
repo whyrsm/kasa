@@ -75,13 +75,13 @@ def _check_one(pdf: Path) -> int:
     print(f"\n{pdf.name}")
     print(f"  period={statement.period}  rows={len(statement.transactions)}")
     print(f"  DEBIT={debit:,.2f}  CREDIT={credit:,.2f}  movement={movement:,.2f}")
-    print(f"  PDF: LAST={last:,.2f}  ENDING={ending:,.2f}  expected_movement={expected_movement:,.2f}")
+    print(
+        f"  PDF: LAST={last:,.2f}  ENDING={ending:,.2f}  expected_movement={expected_movement:,.2f}"
+    )
 
     fails = 0
     if abs(movement - expected_movement) > TOLERANCE:
-        print(
-            f"  RECONCILE FAIL: movement {movement:,.2f} != expected {expected_movement:,.2f}"
-        )
+        print(f"  RECONCILE FAIL: movement {movement:,.2f} != expected {expected_movement:,.2f}")
         fails += 1
 
     stmt_year = int(statement.period.split("-")[0])

@@ -32,9 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     fail = 0
     for pdf in pdfs:
         try:
-            out_path, rows = _process_one(
-                pdf, password_override=args.password, out_dir=out_dir
-            )
+            out_path, rows = _process_one(pdf, password_override=args.password, out_dir=out_dir)
         except (PdfDecryptError, UnknownStatementError) as e:
             print(f"FAIL  {pdf.name}: {e}", file=sys.stderr)
             fail += 1

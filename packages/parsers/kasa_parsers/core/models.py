@@ -3,10 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
-from enum import Enum
+from enum import StrEnum
 
 
-class Direction(str, Enum):
+class Direction(StrEnum):
     DEBIT = "DEBIT"
     CREDIT = "CREDIT"
 

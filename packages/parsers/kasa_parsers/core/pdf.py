@@ -27,12 +27,7 @@ def read_pdf_pages(path: Path, password: str | None) -> list[list[str]]:
     try:
         if doc.needs_pass:
             if password is None or not doc.authenticate(password):
-                raise PdfDecryptError(
-                    f"failed to decrypt {path.name}: wrong or missing password"
-                )
-        return [
-            [line for line in page.get_text().splitlines() if line.strip()]
-            for page in doc
-        ]
+                raise PdfDecryptError(f"failed to decrypt {path.name}: wrong or missing password")
+        return [[line for line in page.get_text().splitlines() if line.strip()] for page in doc]
     finally:
         doc.close()

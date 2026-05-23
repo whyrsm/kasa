@@ -5,8 +5,25 @@ description = "Monorepo workspace for Kasa."
 requires-python = ">=3.11"
 dependencies = []
 
+[dependency-groups]
+dev = [
+    "ruff>=0.6",
+]
+
 [tool.uv.workspace]
 members = [
     "apps/api",
     "packages/parsers",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["archives", "apps/web/dist", "apps/web/node_modules"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+# Smoke script does sys.path manipulation before importing; long debug lines.
+"packages/parsers/tests/test_cimb_cc.py" = ["E402", "E501"]

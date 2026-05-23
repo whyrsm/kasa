@@ -14,7 +14,9 @@
     "test:api": "uv run --package kasa-api python -m pytest apps/api/tests",
     "test:parsers": "uv run --package kasa-parsers python -m pytest packages/parsers/tests --ignore=packages/parsers/tests/test_cimb_cc.py",
     "smoke:parsers": "uv run --package kasa-parsers python packages/parsers/tests/test_cimb_cc.py",
+    "lint": "uv run ruff check . && uv run ruff format --check .",
+    "lint:fix": "uv run ruff check --fix . && uv run ruff format .",
     "build": "npm run build:web",
-    "test": "npm run test:parsers && npm run test:api && npm run build:web"
+    "test": "npm run lint && npm run test:parsers && npm run test:api && npm run build:web"
   }
 }

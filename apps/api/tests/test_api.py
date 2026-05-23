@@ -2,9 +2,7 @@ from __future__ import annotations
 
 import pytest
 from fastapi.testclient import TestClient
-
 from kasa_api.main import app
-
 
 client = TestClient(app, raise_server_exceptions=False)
 

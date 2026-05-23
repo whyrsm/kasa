@@ -3,11 +3,10 @@ from __future__ import annotations
 import logging
 import os
 
+import kasa_parsers  # noqa: F401 - registers bundled parsers
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-
-import kasa_parsers  # noqa: F401 - registers bundled parsers
 
 from .routes import parsers, statements
 from .schemas import HealthResponse
