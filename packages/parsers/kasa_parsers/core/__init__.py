@@ -1,6 +1,6 @@
 from .base import StatementParser
 from .models import Direction, Statement, Transaction
-from .pdf import PdfDecryptError, read_pdf_pages
+from .pdf import InvalidPdfError, PdfDecryptError, read_pdf_pages
 from .registry import (
     UnknownStatementError,
     all_parsers,
@@ -11,6 +11,7 @@ from .tsv import write_tsv
 
 __all__ = [
     "Direction",
+    "InvalidPdfError",
     "PdfDecryptError",
     "Statement",
     "StatementParser",

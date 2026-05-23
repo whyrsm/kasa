@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 
 from fastapi import FastAPI, HTTPException, Request
@@ -10,6 +11,8 @@ import kasa_parsers  # noqa: F401 - registers bundled parsers
 
 from .routes import parsers, statements
 from .schemas import HealthResponse
+
+logger = logging.getLogger("kasa_api")
 
 
 def _cors_allow_origins() -> list[str]:
@@ -43,6 +46,22 @@ async def http_exception_handler(
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": "HTTP_ERROR", "message": str(exc.detail)},
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(
+    request: Request,
+    exc: Exception,
+) -> JSONResponse:
+    logger.exception(
+        "unhandled_exception path=%s method=%s",
+        request.url.path,
+        request.method,
+    )
+    return JSONResponse(
+        status_code=500,
+        content={"error": "INTERNAL", "message": "Internal server error."},
     )
 
 

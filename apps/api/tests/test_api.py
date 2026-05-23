@@ -1,11 +1,12 @@
 from __future__ import annotations
 
+import pytest
 from fastapi.testclient import TestClient
 
 from kasa_api.main import app
 
 
-client = TestClient(app)
+client = TestClient(app, raise_server_exceptions=False)
 
 
 def test_health() -> None:
@@ -45,6 +46,24 @@ def test_parse_rejects_invalid_pdf_bytes() -> None:
 
     assert response.status_code == 400
     assert response.json() == {
-        "error": "PARSE_FAILED",
-        "message": "Could not parse PDF.",
+        "error": "INVALID_PDF",
+        "message": "Could not read file as a PDF.",
     }
+
+
+def test_unhandled_exception_returns_500(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Bug in parser code must surface as 500 INTERNAL, not a user-facing 400."""
+    from kasa_api.routes import statements as statements_route
+
+    def boom(*_args: object, **_kwargs: object) -> None:
+        raise RuntimeError("parser exploded")
+
+    monkeypatch.setattr(statements_route, "parse_pdf_to_response", boom)
+
+    response = client.post(
+        "/api/statements/parse",
+        files={"file": ("statement.pdf", b"%PDF-1.4 fake", "application/pdf")},
+    )
+
+    assert response.status_code == 500
+    assert response.json() == {"error": "INTERNAL", "message": "Internal server error."}

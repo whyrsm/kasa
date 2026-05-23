@@ -5,7 +5,7 @@ import tempfile
 from pathlib import Path
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
-from kasa_parsers.core import PdfDecryptError, UnknownStatementError
+from kasa_parsers.core import InvalidPdfError, PdfDecryptError, UnknownStatementError
 
 from ..schemas import ApiError, StatementParseResponse
 from ..services.parsing import parse_pdf_to_response
@@ -43,6 +43,12 @@ async def parse_statement(
             password=password,
             parser_name=parser_name,
         )
+    except InvalidPdfError as e:
+        raise _api_error(
+            status_code=400,
+            code="INVALID_PDF",
+            message="Could not read file as a PDF.",
+        ) from e
     except PdfDecryptError as e:
         raise _api_error(
             status_code=400,
@@ -59,13 +65,7 @@ async def parse_statement(
         raise _api_error(
             status_code=400,
             code="PARSE_FAILED",
-            message=str(e),
-        ) from e
-    except Exception as e:
-        raise _api_error(
-            status_code=400,
-            code="PARSE_FAILED",
-            message="Could not parse PDF.",
+            message="Could not extract transactions from this statement.",
         ) from e
     finally:
         await file.close()
