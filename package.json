@@ -6,6 +6,7 @@
     "apps/web"
   ],
   "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev:api\" \"npm run dev:web\"",
     "dev:api": "uv run --package kasa-api fastapi dev apps/api/kasa_api/main.py",
     "dev:web": "npm run dev --workspace kasa-web",
     "start:api": "uv run --package kasa-api uvicorn kasa_api.main:app --app-dir apps/api --host 0.0.0.0 --port ${PORT:-8000}",
@@ -18,5 +19,8 @@
     "lint:fix": "uv run ruff check --fix . && uv run ruff format .",
     "build": "npm run build:web",
     "test": "npm run lint && npm run test:parsers && npm run test:api && npm run build:web"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3"
   }
 }
