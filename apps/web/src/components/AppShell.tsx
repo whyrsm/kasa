@@ -3,10 +3,11 @@ import { Landmark } from "lucide-react";
 
 type AppShellProps = {
   parserCount: number;
+  sidebarCollapsed: boolean;
   children: ReactNode;
 };
 
-export function AppShell({ parserCount, children }: AppShellProps) {
+export function AppShell({ parserCount, sidebarCollapsed, children }: AppShellProps) {
   return (
     <div className="app-shell">
       <header className="top-bar">
@@ -20,7 +21,9 @@ export function AppShell({ parserCount, children }: AppShellProps) {
           {parserCount} supported parser{parserCount === 1 ? "" : "s"}
         </div>
       </header>
-      <main className="workspace">{children}</main>
+      <main className={`workspace${sidebarCollapsed ? " is-panel-collapsed" : ""}`}>
+        {children}
+      </main>
     </div>
   );
 }
