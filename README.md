@@ -118,39 +118,58 @@ npm test
 
 ## Railway Deployment
 
-Deploy this monorepo as two Railway services from the same repository.
+Deploy this monorepo as a single Railway service. The build compiles the
+React app, then FastAPI serves both the API (under `/api/*`) and the built
+frontend (everything else) from one process — one domain, no CORS wiring
+between services.
 
-API service:
+### 1. Create the service
 
-- Root directory: `/`
-- Railpack config: `railpack.json`
-- Start command is defined in `railpack.json`:
+- New Service → Deploy from GitHub repo → this repo.
+- Settings → Root Directory: `/`
+- Railpack picks up `railpack.json` automatically. It installs Node 22,
+  Python 3.12, and `uv` in the same build image (`packages` in
+  `railpack.json`), and runs the start command already defined there:
 
 ```bash
 uv run --package kasa-api uvicorn kasa_api.main:app --app-dir apps/api --host 0.0.0.0 --port ${PORT:-8000}
 ```
 
-- Healthcheck path: `/api/health`
-- Variables:
+- Settings → Healthcheck Path: `/api/health`
+- Settings → Networking → Generate Domain.
+
+### 2. Set the build/install commands and build-time variable
+
+Railpack's default provider only knows one language per build. Since this
+build needs both npm and uv, override the install/build commands with
+Service Variables (Variables tab, not `railpack.json`):
 
 ```bash
-CORS_ALLOW_ORIGINS=https://${{kasa-web.RAILWAY_PUBLIC_DOMAIN}}
+RAILPACK_INSTALL_CMD=npm ci && uv sync --all-packages
+RAILPACK_BUILD_CMD=npm run build:web
+VITE_API_BASE_URL=
 ```
 
-Web service:
+`VITE_API_BASE_URL` must be set to an empty value. It gets baked into the
+JS bundle at build time — leaving it empty makes the frontend call `/api/...`
+as a relative path, which resolves correctly against whatever domain Railway
+gives the service. `PORT` is injected by Railway automatically — do not set
+it manually.
 
-- Root directory: `/apps/web`
-- Build command:
+### Notes
 
-```bash
-npm run build
-```
-
-- Variables:
-
-```bash
-VITE_API_BASE_URL=https://${{kasa-api.RAILWAY_PUBLIC_DOMAIN}}
-```
-
-Adjust `kasa-api` and `kasa-web` in the reference variables if the Railway
-services use different names.
+- This is a single-page app with no client-side router yet, so
+  `StaticFiles(..., html=True)` serving `index.html` only at `/` is enough.
+  If client-side routing is added later, the static mount in
+  `apps/api/kasa_api/main.py` will need an explicit fallback to `index.html`
+  for unmatched paths, or unknown routes will 404 instead of resolving
+  client-side.
+- Uploaded PDFs are only ever written to a temp file during parsing and
+  deleted after the response — no persistent storage/volume is required.
+- Prefer two separate services instead? Put the API back on its own
+  Railpack config (root `/`, same start command) and the web app on a
+  static-site service (root `/apps/web`, build command `npm run build`,
+  Railpack auto-serves the Vite `dist` output) with `CORS_ALLOW_ORIGINS` /
+  `VITE_API_BASE_URL` cross-referencing each service's
+  `RAILWAY_PUBLIC_DOMAIN`. That trades this setup's simplicity for
+  independent deploys/scaling of the two halves.
