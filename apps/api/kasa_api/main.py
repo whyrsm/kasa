@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import logging
 import os
+from pathlib import Path
 
 import kasa_parsers  # noqa: F401 - registers bundled parsers
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from .routes import parsers, statements
 from .schemas import HealthResponse
@@ -71,3 +73,10 @@ def health() -> HealthResponse:
 
 app.include_router(parsers.router)
 app.include_router(statements.router)
+
+# Serves the built React app when deployed as a single combined service.
+# Mounted last so it only catches paths the API routers above don't handle.
+# Absent during local dev, where the web UI runs as its own Vite server.
+_web_dist = Path(__file__).resolve().parents[2] / "web" / "dist"
+if _web_dist.is_dir():
+    app.mount("/", StaticFiles(directory=_web_dist, html=True), name="web")
