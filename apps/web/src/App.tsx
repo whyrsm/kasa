@@ -28,6 +28,7 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [direction, setDirection] = useState<DirectionFilter>("ALL");
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [isUploadPanelCollapsed, setIsUploadPanelCollapsed] = useState(false);
 
   useEffect(() => {
     fetchParsers()
@@ -72,6 +73,7 @@ export default function App() {
       setStatement(parsed);
       setSearch("");
       setDirection("ALL");
+      setIsUploadPanelCollapsed(true);
     } catch (error) {
       const apiError = error as ApiError;
       setParseError({
@@ -109,8 +111,11 @@ export default function App() {
     }
   }
 
+  const canCollapsePanel = Boolean(statement);
+  const isPanelCollapsed = isUploadPanelCollapsed && canCollapsePanel;
+
   return (
-    <AppShell parserCount={parsers.length}>
+    <AppShell parserCount={parsers.length} sidebarCollapsed={isPanelCollapsed}>
       <StatementUploadPanel
         parsers={parsers}
         selectedParser={selectedParser}
@@ -118,10 +123,13 @@ export default function App() {
         file={file}
         isParsing={isParsing}
         parserLoadError={parserLoadError}
+        collapsed={isPanelCollapsed}
+        canCollapse={canCollapsePanel}
         onParserChange={setSelectedParser}
         onPasswordChange={setPassword}
         onFileChange={setFile}
         onParse={handleParse}
+        onToggleCollapsed={() => setIsUploadPanelCollapsed((prev) => !prev)}
       />
 
       <section className="result-panel">

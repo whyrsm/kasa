@@ -68,15 +68,16 @@ Generated TSVs are written under `archives/tsv/`, which is ignored by git.
 
 ## Local Web App
 
-Start the API:
+Start both the API and the web UI together:
+
+```bash
+npm run dev
+```
+
+Or run them separately in two terminals if you want their logs apart:
 
 ```bash
 npm run dev:api
-```
-
-Start the web UI in a second terminal:
-
-```bash
 npm run dev:web
 ```
 

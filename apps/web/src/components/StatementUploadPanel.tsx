@@ -1,4 +1,4 @@
-import { FileUp, Lock, Play, ShieldCheck, Trash2, Upload } from "lucide-react";
+import { FileUp, Lock, PanelLeftClose, PanelLeftOpen, Play, ShieldCheck, Trash2, Upload } from "lucide-react";
 
 import type { ParserMetadata } from "../api/types";
 
@@ -9,10 +9,13 @@ type StatementUploadPanelProps = {
   file: File | null;
   isParsing: boolean;
   parserLoadError: string | null;
+  collapsed: boolean;
+  canCollapse: boolean;
   onParserChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
   onFileChange: (file: File | null) => void;
   onParse: () => void;
+  onToggleCollapsed: () => void;
 };
 
 export function StatementUploadPanel({
@@ -22,17 +25,47 @@ export function StatementUploadPanel({
   file,
   isParsing,
   parserLoadError,
+  collapsed,
+  canCollapse,
   onParserChange,
   onPasswordChange,
   onFileChange,
   onParse,
+  onToggleCollapsed,
 }: StatementUploadPanelProps) {
   const canParse = Boolean(file) && !isParsing;
+
+  if (collapsed) {
+    return (
+      <aside className="upload-panel upload-panel-collapsed">
+        <button
+          className="panel-toggle"
+          onClick={onToggleCollapsed}
+          aria-label="Show upload panel"
+          title="Show upload panel"
+        >
+          <PanelLeftOpen aria-hidden="true" size={18} />
+        </button>
+      </aside>
+    );
+  }
 
   return (
     <aside className="upload-panel">
       <section>
-        <h2>Upload Statement</h2>
+        <div className="upload-panel-heading">
+          <h2>Upload Statement</h2>
+          {canCollapse ? (
+            <button
+              className="panel-toggle"
+              onClick={onToggleCollapsed}
+              aria-label="Hide upload panel"
+              title="Hide upload panel"
+            >
+              <PanelLeftClose aria-hidden="true" size={18} />
+            </button>
+          ) : null}
+        </div>
         <label className="field">
           <span>Bank / Parser</span>
           <select
